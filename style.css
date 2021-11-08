@@ -1,3 +1,15 @@
 p{
     color: pink;
 }
+
+header{
+    background-color: red;
+}
+
+footer{
+    background-color: green;
+}
+
+#page{
+    background-color: blue;
+}

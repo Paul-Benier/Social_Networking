@@ -11,12 +11,14 @@
             <?php include('header.php'); ?>
         </header> <!-- ##### end - HEADER ##### -->
         
-        This is the main page
+        <div id="page">
+            This is the main page
+        </div>
 
         <footer>  <!-- ##### FOOTER ##### -->
             <?php include('footer.php'); ?>
         </footer> <!-- ##### end - FOOTER ##### -->
-        
+
     </body>
 </html>
 
