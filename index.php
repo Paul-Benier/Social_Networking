@@ -6,13 +6,17 @@
         <link rel="stylesheet" href="style.css" type="text/css">
     </head>
     <body>
-        <!-- ##### HEADER ##### -->
-        <?php include('header.php'); ?>
-        <!-- ##### end - HEADER ##### -->
+        
+        <header>  <!-- ##### HEADER ##### -->
+            <?php include('header.php'); ?>
+        </header> <!-- ##### end - HEADER ##### -->
+        
         This is the main page
-        <!-- ##### FOOTER ##### -->
-        <?php include('footer.php'); ?>
-        <!-- ##### end - FOOTER ##### -->
+
+        <footer>  <!-- ##### FOOTER ##### -->
+            <?php include('footer.php'); ?>
+        </footer> <!-- ##### end - FOOTER ##### -->
+        
     </body>
 </html>
 
