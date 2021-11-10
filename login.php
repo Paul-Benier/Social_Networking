@@ -8,7 +8,7 @@ $mysqlClient = new PDO(
     );
 }
 catch(Exception $e){ // ##### error - database connection #####
-    die('Erreur : '.$e->getMessage());
+    die('Error : '.$e->getMessage());
 }
 
 // ##### Get the whole user table #####
@@ -25,9 +25,11 @@ if (isset($_POST['email']) &&  isset($_POST['password'])) {
             $user['password'] === $_POST['password']
         ) {
             $loggedUser = $user;
-        } else {
+        } 
+        else {
             $errorMessage = 'Incorrect email or password';
-        }
+
+        } 
     }
 }
 
@@ -37,23 +39,47 @@ if(!isset($loggedUser)): ?>
     
     <!-- ##### Print error if needed ##### -->
     <?php if(isset($errorMessage)) : ?>
-        <div class="alert alert-danger" role="alert">
+        <div role="alert">
             <?php echo $errorMessage; ?>
         </div>
     <?php endif; ?>
 
-    <label for="email" class="form-label">Email</label>
-    <input type="email" class="form-control" id="email" name="email" aria-describedby="email-help" placeholder="email@example.com">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" aria-describedby="email-help" placeholder="email@example.com">
     
-    <label for="password" class="form-label">Password</label>
-    <input type="password" class="form-control" id="password" name="password">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
     
-    <button type="submit" class="btn btn-primary">Sign in</button>
+    <button type="submit">Sign in</button>
 </form>
 
 <!-- ##### The user is logged in ##### -->
 <?php else: ?>
-    <div class="alert alert-success" role="alert">
+    <div role="alert">
         <?php echo $loggedUser['first_name']; ?>
     </div>
 <?php endif; ?>
+
+
+<!-- ##### Form Sign up ##### -->
+<form action="index.php" method="post">
+    <label for="first_name" >First name</label>
+    <input type="text" id="first_name" name="first_name" placeholder="John">
+    
+    <label for="last_name" >Last Name</label>
+    <input type="text" id="last_name" name="last_name" placeholder="Smith">
+
+    <label for="email" >Email</label>
+    <input type="email" id="email" name="email" placeholder="email@example.com">
+
+    <label for="birth_year">Birth year</label>
+    <input type="number" id="birth_year" name="birth_year" placeholder="1999" min="1900" max="2021" value="1999"> 
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
+    
+    <label for="password_2">Confirm password</label>
+    <input type="password" id="password_2" name="password_2">
+    
+    <button type="submit">Sign up</button>
+</form>
