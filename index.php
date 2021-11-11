@@ -29,11 +29,25 @@
         
         <header>  <!-- ##### HEADER ##### -->
             <?php include('header.php'); ?>
-            <?php include('login.php'); ?>
         </header> <!-- ##### end - HEADER ##### -->
         
         <div id="page">
-            This is the main page
+            
+            <?php 
+            if(isset($_POST['login'])){
+                if($_POST['login'] == "Signup"){
+                    include('signup.php');
+                }
+                else{
+                    include('login.php');
+                }
+            } ?>
+
+            <form action="index.php" method="post">
+                <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
+                <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
+            </form>
+
         </div>
 
         <footer>  <!-- ##### FOOTER ##### -->
