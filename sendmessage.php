@@ -16,17 +16,6 @@
 </body>
 
 <?php
-    try{ // ##### database connection #####
-        $mysqlClient = new PDO(
-            'mysql:host=localhost;dbname=social_networking;charset=utf8',
-            'root',
-            'root'
-        );
-    }
-    catch(Exception $e){ // ##### error - database connection #####
-        die('Erreur : '.$e->getMessage());
-    }
-    
     // Let's test if the file has been sent and if there are no errors
     if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
     {

@@ -41,7 +41,9 @@
                 else{
                     include('login.php');
                 }
-            } ?>
+            }
+            include('loginverification.php');
+            ?>
 
             <form action="index.php" method="post">
                 <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->

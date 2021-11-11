@@ -17,21 +17,6 @@ $usersStatement = $mysqlClient->prepare($sqlQuery);
 $usersStatement->execute();
 $users = $usersStatement->fetchAll();
 
-// ##### Login validation #####
-if (isset($_POST['email']) &&  isset($_POST['password'])) {
-    foreach ($users as $user) {
-        if (
-            $user['email'] === $_POST['email'] &&
-            $user['password'] === $_POST['password']
-        ) {
-            $loggedUser = $user;
-        } 
-        else {
-            $errorMessage = 'Incorrect email or password';
-        } 
-    }
-}
-
 // ##### Login form when the user is disconnect #####
 if(!isset($loggedUser)): ?>
 <form action="index.php" method="post">
@@ -51,10 +36,4 @@ if(!isset($loggedUser)): ?>
     
     <button type="submit">Sign in</button>
 </form>
-
-<!-- ##### The user is logged in ##### -->
-<?php else: ?>
-    <div role="alert">
-        <?php echo $loggedUser['first_name']; ?>
-    </div>
 <?php endif; ?>
