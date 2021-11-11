@@ -1,0 +1,3 @@
+<body>
+    Profile page
+</body>

@@ -1,0 +1,3 @@
+<body>
+    Messaging page
+</body>
