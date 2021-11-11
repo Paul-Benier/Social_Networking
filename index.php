@@ -48,6 +48,23 @@
                 <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
             </form>
 
+            <?php 
+            if(isset($_POST['menu'])){
+                if($_POST['menu'] == "Members"){
+                    include('members.php');
+                }
+                else if($_POST['menu'] == "Messaging"){
+                    include('messaging.php');
+                }
+                else if($_POST['menu'] == "Myprofile"){
+                    include('profile.php');
+                }
+                else{
+                    include('home.php');
+                }
+            }
+            ?>
+
         </div>
 
         <footer>  <!-- ##### FOOTER ##### -->
