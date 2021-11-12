@@ -2,12 +2,6 @@ header{
     background-color: red;
 }
 
-header ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
 footer{
     background-color: green;
 }

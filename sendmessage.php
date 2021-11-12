@@ -6,12 +6,10 @@
         <label for="content">Content</label>
         <textarea name="content" id="content" placeholder="Write your message here..."></textarea>
         
-        <div class="mb-3">
-            <label for="screenshot" class="form-label">Insert a file here</label>
-            <input type="file" class="form-control" id="screenshot" name="screenshot" />
-        </div>
+        <label for="screenshot">Insert a file here</label>
+        <input type="file" id="screenshot" name="screenshot"/>
         
-        <button type="submit" class="btn btn-primary">Send</button>
+        <button type="submit">Send</button>
     </form>
 </body>
 
@@ -30,7 +28,8 @@
             {
                 // The file can be validated and stored permanently
                 move_uploaded_file($_FILES['screenshot']['tmp_name'], 'uploads/' . basename($_FILES['screenshot']['name']));
-                echo "The shipment was successful!";
+                echo "The shipment was successful!\n";
+                
             }
         }
     }
