@@ -1,5 +1,5 @@
 <?php
-try{ // ##### database connection #####
+/*try{ // ##### database connection #####
 $mysqlClient = new PDO(
     'mysql:host=localhost;dbname=social_networking;charset=utf8',
     'root',
@@ -8,7 +8,7 @@ $mysqlClient = new PDO(
 }
 catch(Exception $e){ // ##### error - database connection #####
     die('Error : '.$e->getMessage());
-}
+}*/
 
 // ##### Get the whole user table #####
 $sqlQuery = 'SELECT * FROM user';
@@ -46,7 +46,7 @@ else if (isset($_POST['email']) && isset($_POST['password'])) {
             password_verify($_POST['password'], $user['password'])
         ) {
             $loggedUser = $user;
-            echo $loggedUser['first_name'];
+            $_SESSION['LOGGED_USER'] = $loggedUser['first_name'];
         } 
         else {
             $errorMessage = 'Incorrect email or password';

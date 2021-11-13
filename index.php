@@ -1,3 +1,27 @@
+<?php 
+
+session_start(); 
+
+try{ // ##### database connection #####
+    $mysqlClient = new PDO(
+        'mysql:host=localhost;dbname=social_networking;charset=utf8',
+        'root',
+        'root'
+    );
+}
+
+catch(Exception $e){ // ##### error - database connection #####
+    die('Error : '.$e->getMessage());
+}
+
+// ##### Get the whole user table #####
+$sqlQuery = 'SELECT * FROM user';
+$usersStatement = $mysqlClient->prepare($sqlQuery);
+$usersStatement->execute();
+$users = $usersStatement->fetchAll();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,29 +30,14 @@
         <link rel="stylesheet" href="style.css" type="text/css">
     </head>
     <body>
-
-        <?php
-
-        try{ // ##### database connection #####
-            $mysqlClient = new PDO(
-                'mysql:host=localhost;dbname=social_networking;charset=utf8',
-                'root',
-                'root'
-            );
-        }
-        catch(Exception $e){ // ##### error - database connection #####
-            die('Erreur : '.$e->getMessage());
-        }
-
-        // ##### Get the whole user table #####
-        $sqlQuery = 'SELECT * FROM user';
-        $usersStatement = $mysqlClient->prepare($sqlQuery);
-        $usersStatement->execute();
-        $users = $usersStatement->fetchAll();
-        ?>
         
         <header>  <!-- ##### HEADER ##### -->
-            <?php include('header.php'); ?>
+            <?php 
+            include('header.php'); 
+            if(isset($_SESSION['LOGGED_USER'])){
+                echo $_SESSION['LOGGED_USER'];
+            }
+            ?>
         </header> <!-- ##### end - HEADER ##### -->
         
         <div id="page">
@@ -38,7 +47,10 @@
                 if($_POST['login'] == "Signup"){
                     include('signup.php');
                 }
-                else{
+                else if ($_POST['login'] == "Disconnect"){
+                    session_destroy();
+                }
+                else if ($_POST['login'] == "Signin"){
                     include('login.php');
                 }
             }
@@ -46,8 +58,12 @@
             ?>
 
             <form action="index.php" method="post">
-                <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
-                <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
+                <?php if(!isset($_SESSION['LOGGED_USER'])): ?>
+                    <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
+                    <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
+                <?php else : ?>
+                    <button type="submit" name="login" value="Disconnect">Disconnect</button> <!-- Disconnect -->
+                <?php endif ?>
             </form>
 
             <?php 

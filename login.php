@@ -1,6 +1,6 @@
 <?php 
 
-try{ // ##### database connection #####
+/*try{ // ##### database connection #####
 $mysqlClient = new PDO(
     'mysql:host=localhost;dbname=social_networking;charset=utf8',
     'root',
@@ -9,7 +9,7 @@ $mysqlClient = new PDO(
 }
 catch(Exception $e){ // ##### error - database connection #####
     die('Error : '.$e->getMessage());
-}
+}*/
 
 // ##### Get the whole user table #####
 $sqlQuery = 'SELECT * FROM user';
