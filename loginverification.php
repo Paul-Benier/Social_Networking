@@ -46,7 +46,7 @@ else if (isset($_POST['email']) && isset($_POST['password'])) {
             password_verify($_POST['password'], $user['password'])
         ) {
             $loggedUser = $user;
-            echo $loggedUser['first_name'];
+            $_SESSION['LOGGED_USER'] = $loggedUser['first_name'];
         } 
         else {
             $errorMessage = 'Incorrect email or password';
