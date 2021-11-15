@@ -50,6 +50,7 @@ include('loginverification.php');
                 }
                 else if ($_POST['login'] == "Disconnect"){
                     session_destroy();
+                    header("Refresh:0"); // Refresh the page to actualise the disconnection
                 }
                 else if ($_POST['login'] == "Signin"){
                     include('login.php');
