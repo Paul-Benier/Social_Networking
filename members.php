@@ -2,6 +2,4 @@
 
 ?>
 
-<body>
-    Members page
-</body>
+Members page

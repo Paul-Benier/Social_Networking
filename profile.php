@@ -1,3 +1,1 @@
-<body>
-    Profile page
-</body>
+Profile page

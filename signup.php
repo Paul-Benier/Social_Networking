@@ -1,7 +1,7 @@
 <?php 
 
 // ##### Form Sign up #####
-if(!isset($loggedUser)){ ?>
+if(!isset($_SESSION['LOGGED_USER_fname'])){ ?>
 
 <form action="index.php" method="post">
     <!-- ##### Print error if needed ##### -->

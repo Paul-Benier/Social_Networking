@@ -1,3 +1,1 @@
-<body>
-    Home page
-</body>
+Home page

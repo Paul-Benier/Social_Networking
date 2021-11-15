@@ -20,6 +20,8 @@ $usersStatement = $mysqlClient->prepare($sqlQuery);
 $usersStatement->execute();
 $users = $usersStatement->fetchAll();
 
+include('loginverification.php');
+
 ?>
 
 <!DOCTYPE html>
@@ -34,15 +36,14 @@ $users = $usersStatement->fetchAll();
         <header>  <!-- ##### HEADER ##### -->
             <?php 
             include('header.php'); 
-            if(isset($_SESSION['LOGGED_USER'])){
-                echo $_SESSION['LOGGED_USER'];
+            if(isset($_SESSION['LOGGED_USER_fname'])){
+                echo $_SESSION['LOGGED_USER_fname'];
             }
             ?>
         </header> <!-- ##### end - HEADER ##### -->
         
         <div id="page">
-            
-            <?php 
+            <?php
             if(isset($_POST['login'])){
                 if($_POST['login'] == "Signup"){
                     include('signup.php');
@@ -54,11 +55,10 @@ $users = $usersStatement->fetchAll();
                     include('login.php');
                 }
             }
-            include('loginverification.php');
-            ?>
+            ?>     
 
             <form action="index.php" method="post">
-                <?php if(!isset($_SESSION['LOGGED_USER'])): ?>
+                <?php if(!isset($_SESSION['LOGGED_USER_fname'])): ?>
                     <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
                     <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
                 <?php else : ?>

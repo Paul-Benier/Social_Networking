@@ -1,3 +1,1 @@
-<body>
-    Messaging page
-</body>
+Messaging page

@@ -1,24 +1,7 @@
 <?php 
 
-/*try{ // ##### database connection #####
-$mysqlClient = new PDO(
-    'mysql:host=localhost;dbname=social_networking;charset=utf8',
-    'root',
-    'root'
-    );
-}
-catch(Exception $e){ // ##### error - database connection #####
-    die('Error : '.$e->getMessage());
-}*/
-
-// ##### Get the whole user table #####
-$sqlQuery = 'SELECT * FROM user';
-$usersStatement = $mysqlClient->prepare($sqlQuery);
-$usersStatement->execute();
-$users = $usersStatement->fetchAll();
-
 // ##### Login form when the user is disconnect #####
-if(!isset($loggedUser)): ?>
+if(!isset($_SESSION['LOGGED_USER_fname'])): ?>
 <form action="index.php" method="post">
     
     <!-- ##### Print error if needed ##### -->
