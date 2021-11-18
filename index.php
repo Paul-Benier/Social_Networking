@@ -20,7 +20,15 @@ $usersStatement = $mysqlClient->prepare($sqlQuery);
 $usersStatement->execute();
 $users = $usersStatement->fetchAll();
 
-include('loginverification.php');
+
+// ##### Get the whole relationships table #####
+$sqlQuery = 'SELECT * FROM relationships';
+$relationshipsStatement = $mysqlClient->prepare($sqlQuery);
+$relationshipsStatement->execute();
+$relationships = $relationshipsStatement->fetchAll();
+
+
+include('functions.php');
 
 ?>
 
@@ -30,6 +38,8 @@ include('loginverification.php');
         <meta charset="utf-8">
         <title>Title of the web page</title>
         <link rel="stylesheet" href="style.css" type="text/css">
+        <!-- Responsive design -->
+        <meta name="viewport" content="width=device-width">
     </head>
     <body>
         
@@ -70,16 +80,36 @@ include('loginverification.php');
             <?php 
             if(isset($_POST['menu'])){
                 if($_POST['menu'] == "Members"){
-                    include('members.php');
+                    if(isset($_SESSION['LOGGED_USER_fname'])){
+                        include('members.php');
+                    }
+                    else{
+                        echo 'To access the site, you must log in';
+                    }
                 }
                 else if($_POST['menu'] == "Messaging"){
-                    include('messaging.php');
+                    if(isset($_SESSION['LOGGED_USER_fname'])){
+                        include('messaging.php');
+                    }
+                    else{
+                        echo 'To access the site, you must log in';
+                    }
                 }
                 else if($_POST['menu'] == "Myprofile"){
-                    include('profile.php');
+                    if(isset($_SESSION['LOGGED_USER_fname'])){
+                        include('profile.php');
+                    }
+                    else{
+                        echo 'To access the site, you must log in';
+                    }
                 }
                 else{
-                    include('home.php');
+                    if(isset($_SESSION['LOGGED_USER_fname'])){
+                        include('home.php');
+                    }
+                    else{
+                        echo 'To access the site, you must log in';
+                    }
                 }
             }
             ?>
