@@ -25,9 +25,12 @@
             if (in_array($extension, $allowedExtensions))
             {
                 // The file can be validated and stored permanently
-                move_uploaded_file($_FILES['screenshot']['tmp_name'], 'uploads/' . basename($_FILES['screenshot']['name']));
-                echo "The shipment was successful!\n";
-                
+                //move_uploaded_file($_FILES['screenshot']['tmp_name'], 'uploads/' . basename($_FILES['screenshot']['name']));
+                //echo "The shipment was successful!\n";
+                $newName = date("YmdHis").basename($_FILES['screenshot']['name']);
+                $path_in_holder = 'uploads/'.$newName;
+                move_uploaded_file($_FILES['screenshot']['name'], $path_in_holder);
+                echo "<script language = javascript>alert('File uploaded successfully!');</script>";
             }
         }
     }
