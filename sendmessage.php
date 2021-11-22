@@ -30,7 +30,9 @@
                 $newName = date("YmdHis").basename($_FILES['screenshot']['name']);
                 $path_in_holder = 'uploads/'.$newName;
                 move_uploaded_file($_FILES['screenshot']['name'], $path_in_holder);
+                //echo "Upload successfully!";
                 echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+
             }
         }
     }
