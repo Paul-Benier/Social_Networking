@@ -56,10 +56,12 @@ if (isset($_POST['login_form'])){
     }
 }
 
+// ##### Print Error #####
 if(isset($error)){
     echo $error;
 }
 
+// ##### Request friend #####
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
     $sqlQuery = 'INSERT INTO `relationships` (`user_1`, `user_2`, `active`) VALUES (:user_1, :user_2, :active)';
     $insertRelationship = $mysqlClient->prepare($sqlQuery);
@@ -68,7 +70,29 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
         'user_2' => $_POST['id_user'],
         'active' => '1', // for the moment, by default: 1 (active). After 0 by default and 1 when the user_2 accept
     ]);
-    echo "vous êtes maintenant amis avec l'utilisateur " . $_POST['id_user'];
+    echo "You are now friend with " . $_POST['id_user'];
+}
+
+// Upload file :
+// Let's test if the file has been sent and if there are no errors
+if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
+{
+    // Let's test if the file is not too big
+    if ($_FILES['screenshot']['size'] <= 1000000)
+    {
+        // Let's test if the extension is allowed
+        $fileInfo = pathinfo($_FILES['screenshot']['name']);
+        $extension = $fileInfo['extension'];
+        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+        if (in_array($extension, $allowedExtensions))
+        {
+            // The file can be validated and stored permanently
+            $newName = $_SESSION['LOGGED_USER_fname'].date("YmdHis").basename($_FILES['screenshot']['name']);
+            $path_in_holder = 'uploads/'.$newName;
+            move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
+            echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+        }
+    }
 }
 
 ?>
