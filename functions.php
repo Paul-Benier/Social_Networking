@@ -56,11 +56,6 @@ if (isset($_POST['login_form'])){
     }
 }
 
-// ##### Print Error #####
-if(isset($error)){
-    echo $error;
-}
-
 // ##### Request friend #####
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
     $sqlQuery = 'INSERT INTO `relationships` (`user_1`, `user_2`, `active`) VALUES (:user_1, :user_2, :active)';
@@ -73,26 +68,56 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
     echo "You are now friend with " . $_POST['id_user'];
 }
 
-// Upload file :
-// Let's test if the file has been sent and if there are no errors
-if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
-{
-    // Let's test if the file is not too big
-    if ($_FILES['screenshot']['size'] <= 1000000)
-    {
-        // Let's test if the extension is allowed
-        $fileInfo = pathinfo($_FILES['screenshot']['name']);
-        $extension = $fileInfo['extension'];
-        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
-        if (in_array($extension, $allowedExtensions))
-        {
-            // The file can be validated and stored permanently
-            $newName = $_SESSION['LOGGED_USER_fname'].date("YmdHis").basename($_FILES['screenshot']['name']);
-            $path_in_holder = 'uploads/'.$newName;
-            move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
-            echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+
+// ##### Send message (public) ##### publicSend
+if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['publicSend'])){
+    if (isset($_POST['object']) && isset($_POST['content'])){
+        if ($_POST['object'] != ""  && $_POST['content'] != ""){
+            $dateSend = date("YmdHis");
+            if($_FILES['screenshot']['error'] == 0){ // Let's test if the file has been sent and if there are no errors
+                // Let's test if the file is not too big
+                if ($_FILES['screenshot']['size'] <= 1000000)
+                {
+                    // Let's test if the extension is allowed
+                    $fileInfo = pathinfo($_FILES['screenshot']['name']);
+                    $extension = $fileInfo['extension'];
+                    $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+                    if (in_array($extension, $allowedExtensions))
+                    {
+                        // The file can be validated and stored permanently
+                        $newName = $_SESSION['LOGGED_USER_fname'] . $dateSend . basename($_FILES['screenshot']['name']);
+                        $path_in_holder = 'uploads/' . $newName;
+                        move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
+                        echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+                    }
+                    $sqlQuery = 'INSERT INTO `public_post` (`user_id`, `date`, `title`, `content`, `file_name`) VALUES (:user_id, :date, :title, :content, :file_name)';
+                    $insertRelationship = $mysqlClient->prepare($sqlQuery);
+                    $insertRelationship->execute([
+                        'user_id' => $_SESSION['LOGGED_USER_id'],
+                        'date' => $dateSend,
+                        'title' => $_POST['object'],
+                        'content' => $_POST['content'],
+                        'file_name' => $newName,
+                    ]);
+                }
+                else{
+                    $error = 'File too big (Please send a file smaller than 1MB)';
+                }
+            }
+        }
+        else{
+            $error = 'You must send an object and a content';
         }
     }
+    else{
+        $error = 'You must send an object and a content';
+    }
+}
+
+
+// ##### Print Error #####
+if(isset($error)){
+    echo $error;
 }
 
 ?>

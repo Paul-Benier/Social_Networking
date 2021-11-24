@@ -38,7 +38,7 @@
 
     foreach ($relationships as $relationship) {
         if ($relationship['user_2'] == 1){
-            echo $relationship['user_1'] . $user['first_name'] . '<br>';
+            echo $relationship['user_1'] . '<br>';
         }
         else if ($relationship['user_1'] == 1){
             echo $relationship['user_2'] . '<br>';

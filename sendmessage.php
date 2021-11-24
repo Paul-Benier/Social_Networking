@@ -8,5 +8,5 @@
     <label for="screenshot">Insert a file here</label>
     <input type="file" id="screenshot" name="screenshot"/>
         
-    <button type="submit">Send</button>
+    <button type="submit" name="publicSend" value="send">Send</button>
 </form>

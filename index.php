@@ -28,7 +28,15 @@ $relationshipsStatement->execute();
 $relationships = $relationshipsStatement->fetchAll();
 
 
+// ##### Get the whole relationships table #####
+$sqlQuery = 'SELECT * FROM public_post';
+$publicPostStatement = $mysqlClient->prepare($sqlQuery);
+$publicPostStatement->execute();
+$publicPost = $publicPostStatement->fetchAll();
+
+
 include('functions.php');
+
 
 ?>
 
