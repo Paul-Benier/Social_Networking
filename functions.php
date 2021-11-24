@@ -56,16 +56,51 @@ if (isset($_POST['login_form'])){
     }
 }
 
+
+// ##### Put all relationships in the $_SESSION["relationShips"] array #####
+if (!isset($_SESSION["relationShips"]) && isset($_SESSION["LOGGED_USER_id"])){
+    $_SESSION["relationShips"] = array();
+    $counterRelationShips = 0;
+    $test = $_SESSION["LOGGED_USER_id"];
+    $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . $test . ' AND `active`= 1 OR `user_2` = ' . $test . ' AND `active`= 1';
+    $searchRelationship = $mysqlClient->prepare($sqlQuery);
+    $searchRelationship->execute();
+    $relationships = $searchRelationship->fetchAll();
+
+    foreach ($relationships as $relationship) {
+        if ($relationship['user_2'] == $test){
+            $_SESSION["relationShips"][$counterRelationShips] = $relationship['user_1'];
+            $counterRelationShips++;
+        }
+        else if ($relationship['user_1'] == $test){
+            $_SESSION["relationShips"][$counterRelationShips] = $relationship['user_2'];
+            $counterRelationShips++;
+        }
+    }
+
+    sort($_SESSION["relationShips"]);
+}
+
+
 // ##### Request friend #####
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
-    $sqlQuery = 'INSERT INTO `relationships` (`user_1`, `user_2`, `active`) VALUES (:user_1, :user_2, :active)';
-    $insertRelationship = $mysqlClient->prepare($sqlQuery);
-    $insertRelationship->execute([
-        'user_1' => $_SESSION['LOGGED_USER_id'],
-        'user_2' => $_POST['id_user'],
-        'active' => '1', // for the moment, by default: 1 (active). After 0 by default and 1 when the user_2 accept
-    ]);
-    echo "You are now friend with " . $_POST['id_user'];
+    if ($_POST['id_user'] != ""){
+        $sqlQuery = 'INSERT INTO `relationships` (`user_1`, `user_2`, `active`) VALUES (:user_1, :user_2, :active)';
+        $insertRelationship = $mysqlClient->prepare($sqlQuery);
+        $insertRelationship->execute([
+            'user_1' => $_SESSION['LOGGED_USER_id'],
+            'user_2' => $_POST['id_user'],
+            'active' => '1', // for the moment, by default: 1 (active). After 0 by default and 1 when the user_2 accept
+        ]);
+
+        $_SESSION["relationShips"][count($_SESSION["relationShips"])] = $_POST['id_user'];
+        sort($_SESSION["relationShips"]);
+        
+        echo "You are now friend with " . $_POST['id_user'];
+    }
+    else{
+        $error = 'Please enter a correct number';
+    }
 }
 
 
