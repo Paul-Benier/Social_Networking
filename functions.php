@@ -108,36 +108,55 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['publicSend'])){
     if (isset($_POST['object']) && isset($_POST['content'])){
         if ($_POST['object'] != ""  && $_POST['content'] != ""){
-            $dateSend = date("YmdHis");
-            if($_FILES['screenshot']['error'] == 0){ // Let's test if the file has been sent and if there are no errors
-                // Let's test if the file is not too big
-                if ($_FILES['screenshot']['size'] <= 1000000)
-                {
-                    // Let's test if the extension is allowed
-                    $fileInfo = pathinfo($_FILES['screenshot']['name']);
-                    $extension = $fileInfo['extension'];
-                    $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
-                    if (in_array($extension, $allowedExtensions))
+            if(strlen($_POST['content']) < 512 && strlen($_POST['object']) < 256){
+                $dateSend = date("YmdHis");
+                if($_FILES['screenshot']['error'] == 0){ // Let's test if the file has been sent and if there are no errors
+                    // Let's test if the file is not too big
+                    if ($_FILES['screenshot']['size'] <= 10000000)
                     {
-                        // The file can be validated and stored permanently
-                        $newName = $_SESSION['LOGGED_USER_fname'] . $dateSend . basename($_FILES['screenshot']['name']);
-                        $path_in_holder = 'uploads/' . $newName;
-                        move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
-                        echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+                        // Let's test if the extension is allowed
+                        $fileInfo = pathinfo($_FILES['screenshot']['name']);
+                        $extension = $fileInfo['extension'];
+                        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+                        if (in_array($extension, $allowedExtensions))
+                        {
+                            // The file can be validated and stored permanently
+                            $newName = $_SESSION['LOGGED_USER_id'] . '_' . $_SESSION['LOGGED_USER_fname'] . '_' . $dateSend . '.' . $fileInfo['extension'] /*. basename($_FILES['screenshot']['name'])*/;
+                            $path_in_holder = 'uploads/' . $newName;
+                            move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
+                            echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+                            
+                            $sqlQuery = 'INSERT INTO `public_post` (`user_id`, `date`, `title`, `content`, `file_name`) VALUES (:user_id, :date, :title, :content, :file_name)';
+                            $insertRelationship = $mysqlClient->prepare($sqlQuery);
+                            $insertRelationship->execute([
+                                'user_id' => $_SESSION['LOGGED_USER_id'],
+                                'date' => $dateSend,
+                                'title' => $_POST['object'],
+                                'content' => $_POST['content'],
+                                'file_name' => $newName,
+                            ]);
+                        }
+                        else{
+                            $error = 'File not allowed. Please send jpg, jpeg, gif or png';
+                        }
                     }
-                    $sqlQuery = 'INSERT INTO `public_post` (`user_id`, `date`, `title`, `content`, `file_name`) VALUES (:user_id, :date, :title, :content, :file_name)';
+                    else{
+                        $error = 'File too big (Please send a file smaller than 10MB)';
+                    }
+                }
+                else{
+                    $sqlQuery = 'INSERT INTO `public_post` (`user_id`, `date`, `title`, `content`) VALUES (:user_id, :date, :title, :content)';
                     $insertRelationship = $mysqlClient->prepare($sqlQuery);
                     $insertRelationship->execute([
                         'user_id' => $_SESSION['LOGGED_USER_id'],
                         'date' => $dateSend,
                         'title' => $_POST['object'],
                         'content' => $_POST['content'],
-                        'file_name' => $newName,
                     ]);
                 }
-                else{
-                    $error = 'File too big (Please send a file smaller than 1MB)';
-                }
+            }
+            else{
+                $error = 'Object or content too long (object<256 and content<512)';
             }
         }
         else{

@@ -12,3 +12,8 @@ footer{
     background-color: rgba(28, 27, 33, 1);
     color: rgba(200, 200, 200, 1);
 }
+
+img{
+    max-width: 200px;
+    max-height: 200px;
+}
