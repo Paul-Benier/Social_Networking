@@ -28,11 +28,11 @@ $relationshipsStatement->execute();
 $relationships = $relationshipsStatement->fetchAll();
 
 
-// ##### Get the whole relationships table #####
-$sqlQuery = 'SELECT * FROM public_post';
-$publicPostStatement = $mysqlClient->prepare($sqlQuery);
-$publicPostStatement->execute();
-$publicPost = $publicPostStatement->fetchAll();
+// ##### Get the whole public_post table #####
+$sqlQuery = 'SELECT * FROM public_post ORDER BY `date` DESC';
+$publicPostsStatement = $mysqlClient->prepare($sqlQuery);
+$publicPostsStatement->execute();
+$publicPosts = $publicPostsStatement->fetchAll();
 
 
 include('functions.php');
@@ -77,9 +77,17 @@ include('functions.php');
             ?>     
 
             <form action="index.php" method="post">
-                <?php if(!isset($_SESSION['LOGGED_USER_fname'])): ?>
-                    <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
-                    <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
+                <?php if(!isset($_SESSION['LOGGED_USER_fname'])) : ?>
+                    <?php if (isset($_POST['login'])) : ?>
+                        <?php if ($_POST['login'] != "Signup") : ?>
+                            <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
+                        <?php elseif ($_POST['login'] != "Signin") : ?>
+                            <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
+                        <?php endif ?>
+                    <?php else : ?>
+                        <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
+                        <button type="submit" name="login" value="Signin">Sign in</button> <!-- Login -->
+                    <?php endif ?>
                 <?php else : ?>
                     <button type="submit" name="login" value="Disconnect">Disconnect</button> <!-- Disconnect -->
                 <?php endif ?>
@@ -130,5 +138,3 @@ include('functions.php');
 
     </body>
 </html>
-
-<?php ?>
