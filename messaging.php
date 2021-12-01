@@ -26,9 +26,8 @@
 </table>  
 
 <?php if(isset($friend_id) AND !empty($friend_id)): ?>
-
-    <section id="messages">
-    </section>
+  
+    <section id="messages"></section>  
     
     <form method="post" action="index.php">
         
@@ -37,6 +36,8 @@
         <input type="submit" name="send">
 
     </form>
+
+    
 
 <?php else: ?>
 
