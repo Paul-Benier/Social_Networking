@@ -3,7 +3,6 @@
         var php_id =id;
         <?php $friend_id = "<script>id</script>";?>
     }
-
 </script>
 
 <?php $takeUser = $mysqlClient->query('SELECT * FROM user');?>
@@ -28,8 +27,8 @@
 
 <?php if(isset($friend_id) AND !empty($friend_id)): ?>
 
-    <section id="messages"><?php include ("message.php");?></section>
-    
+    <section id="messages">
+    </section>
     
     <form method="post" action="index.php">
         
