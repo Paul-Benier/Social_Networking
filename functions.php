@@ -174,4 +174,13 @@ if(isset($error)){
     echo $error;
 }
 
+// ##### Send private message #####
+
+if(isset($_POST['send'])){
+    $message= htmlspecialchars($_POST['message']);
+    $send_date = date('y-m-d h:i:s');
+    $insertMessage = $mysqlClient->prepare('INSERT INTO messages(message, id_receiver, id_author, message_date) VALUES(?, ?, ?, ?)');
+    $insertMessage->execute(array($message, $_POST['friend_id'], $_SESSION['LOGGED_USER_id'], $send_date));
+}
+
 ?>

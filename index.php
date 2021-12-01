@@ -46,8 +46,10 @@ include('functions.php');
         <meta charset="utf-8">
         <title>Title of the web page</title>
         <link rel="stylesheet" href="style.css" type="text/css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- Responsive design -->
         <meta name="viewport" content="width=device-width">
+        
     </head>
     <body>
         

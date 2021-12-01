@@ -12,7 +12,7 @@ if(!isset($_SESSION['LOGGED_USER_fname'])) : ?>
         <label for="birth_year">Birth year</label>
         <input type="number" id="birth_year" name="birth_year" placeholder="1999" min="1900" max="2021" value="1999"> 
 
-        <label for="email" >Email</label>
+        <label for="email">Email</label>
         <input type="email" id="email" name="email" placeholder="email@example.com">
 
         <label for="password">Password</label>
