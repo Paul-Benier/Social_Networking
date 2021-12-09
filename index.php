@@ -60,8 +60,8 @@ include('functions.php');
         <header>  <!-- ##### HEADER ##### -->
             <?php 
             include('header.php'); 
-            if(isset($_SESSION['LOGGED_USER_fname'])){
-                echo htmlspecialchars($_SESSION['LOGGED_USER_fname']);
+            if(isset($_SESSION['LOGGED_USER'][0])){
+                echo $_SESSION['LOGGED_USER'][1] . " " . $_SESSION['LOGGED_USER'][2];
             }
             ?>
         </header> <!-- ##### end - HEADER ##### -->
@@ -91,7 +91,7 @@ include('functions.php');
             ?>     
 
             <form action="index.php" method="post">
-                <?php if (!isset($_SESSION['LOGGED_USER_fname'])) : ?>
+                <?php if (!isset($_SESSION['LOGGED_USER'][0])) : ?>
                     <?php if (isset($_POST['login'])) : ?>
                         <?php if ($_POST['login'] != "Signup") : ?>
                             <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
@@ -110,7 +110,7 @@ include('functions.php');
             <?php 
             
             if (isset($_SESSION["return_page"])){
-                if (isset($_SESSION['LOGGED_USER_fname'])){
+                if (isset($_SESSION['LOGGED_USER'][0])){
                     if ($_SESSION["return_page"] == "Profile"){
                         $_SESSION["refresh_friend_array"] = 1;
                         $_SESSION["refresh_friend_array_TBC"] = 1;

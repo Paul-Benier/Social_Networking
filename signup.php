@@ -1,7 +1,7 @@
 <?php 
 
 // ##### Form Sign up #####
-if(!isset($_SESSION['LOGGED_USER_fname'])) : ?>
+if(!isset($_SESSION['LOGGED_USER'][0])) : ?>
     <form action="index.php" method="post">
         <label for="first_name" >First name</label>
         <input type="text" id="first_name" name="first_name" placeholder="John">
