@@ -11,37 +11,57 @@ if (!isset($_SESSION["refresh_friend_array_TBC"])){
 if (!isset($_SESSION["refresh_friend_array_Hold"])){
     $_SESSION["refresh_friend_array_Hold"] = 1;
 }
+ 
+if(isset($_POST['menu']) && isset($_SESSION['LOGGED_USER_fname'])){
+    if($_POST['menu'] == "Home"){
+        $_SESSION["return_page"] = "Home";
+    }
+    else if($_POST['menu'] == "Members"){
+        $_SESSION["return_page"] = "Members";
+    }
+    else if($_POST['menu'] == "Messaging"){
+        $_SESSION["return_page"] = "Messaging";
+    }
+    else if($_POST['menu'] == "Myprofile"){
+        $_SESSION["return_page"] = "Profile";
+    }
+}
 
 // ##### Sign up validation #####
 if (isset($_POST['login_form'])){
     if ($_POST['login_form'] == "Signup"){
         if (isset($_POST['first_name']) && isset($_POST['last_name']) && isset($_POST['birth_year']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['password_2'])) {
-            if ($_POST['first_name'] != "" && $_POST['last_name'] != "" && $_POST['birth_year'] != "" && $_POST['email'] != "" && $_POST['password'] != "" && $_POST['password_2']) {
+            if (htmlspecialchars($_POST['first_name']) != "" && htmlspecialchars($_POST['last_name']) != "" && htmlspecialchars($_POST['birth_year']) != "" && htmlspecialchars($_POST['email']) != "" && $_POST['password'] != "" && $_POST['password_2']) {
                 if ($_POST['password'] === $_POST['password_2']) {
 
                     $sqlQuery = 'INSERT INTO `user`(`first_name`, `last_name`, `email`, `password`, `birth_year`) VALUES (:first_name, :last_name, :email, :password, :birth_year)';
                     $insertUser = $mysqlClient->prepare($sqlQuery);
                     $insertUser->execute([
-                        'first_name' => $_POST['first_name'],
-                        'last_name' => $_POST['last_name'],
-                        'email' => $_POST['email'],
+                        'first_name' => htmlspecialchars($_POST['first_name']),
+                        'last_name' => htmlspecialchars($_POST['last_name']),
+                        'email' => htmlspecialchars($_POST['email']),
                         'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
-                        'birth_year' => $_POST['birth_year'],
+                        'birth_year' => htmlspecialchars($_POST['birth_year']),
                     ]);
 
                     $error = 'The account has been created. Now Sign in !!';
+                    $_SESSION["return_page"] = "Signin";
                 }
                 else {
                     $error = 'Wrong password';
+                    $_SESSION["return_page"] = "Signup";
                 }
             }
             else {
                 $error = 'Please enter all informations';
+                $_SESSION["return_page"] = "Signup";
             }
         }
         else {
             $error = 'Please enter correct informations';
+            $_SESSION["return_page"] = "Signup";
         }
+        
     }
 
     // ##### Login validation #####
@@ -49,7 +69,7 @@ if (isset($_POST['login_form'])){
         if (isset($_POST['email']) && isset($_POST['password'])) {
             $errorvalidation = TRUE;
             foreach ($users as $user) {
-                if ($user['email'] === $_POST['email'] && password_verify($_POST['password'], $user['password'])) {
+                if ($user['email'] === htmlspecialchars($_POST['email']) && password_verify($_POST['password'], $user['password'])) {
                     $_SESSION['LOGGED_USER_id'] = $user['user_id'];
                     $_SESSION['LOGGED_USER_fname'] = $user['first_name'];
                     $_SESSION['LOGGED_USER_lname'] = $user['last_name'];
@@ -60,19 +80,25 @@ if (isset($_POST['login_form'])){
             }
             if ($errorvalidation){
                 $error = 'Incorrect email or password';
+                $_SESSION["return_page"] = "Signin";
+            }
+            else{
+                $_SESSION["return_page"] = "Home";
             }
         }
         else{
             $error = 'Please enter correct informations';
+            $_SESSION["return_page"] = "Signin";
         }
     }
+    header("Refresh:0"); // Refresh the page to actualise
 }
 
 
 // ##### Validate request friend #####
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['validate_request'])){
-    if ($_POST['validate_request'] != ""){
-        $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . $_POST['validate_request'] . ' AND `user_2` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 0';
+    if (htmlspecialchars($_POST['validate_request']) != ""){
+        $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . htmlspecialchars($_POST['validate_request']) . ' AND `user_2` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 0';
         $searchRelationshipValidate = $mysqlClient->prepare($sqlQuery);
         $searchRelationshipValidate->execute();
         $relationshipsValidate = $searchRelationshipValidate->fetchAll();
@@ -85,28 +111,31 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['validate_request'])){
         $sqlQuery = 'UPDATE `relationships` SET user_1=:user_1, user_2=:user_2, active=:active WHERE relationship_id = ' . $validate_friend_id;
         $validateRelationship = $mysqlClient->prepare($sqlQuery);
         $validateRelationship->execute([
-            'user_1' => $_POST['validate_request'],
+            'user_1' => htmlspecialchars($_POST['validate_request']),
             'user_2' => $_SESSION['LOGGED_USER_id'],
             'active' => '1', // 1 when the user_2 accept
         ]);
         $_SESSION["refresh_friend_array"] = 1;
         $_SESSION["refresh_friend_array_TBC"] = 1;
         $_SESSION["refresh_friend_array_Hold"] = 1;
+        $_SESSION["return_page"] = "Profile";
+        header("Refresh:0"); // Refresh the page to actualise
     }
     else{
         $error = 'Please enter a correct number';
+        $_SESSION["return_page"] = "Profile";
     }
 }
 
 
 // ##### Request friend #####
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
-    if ($_POST['id_user'] != ""){
+    if (htmlspecialchars($_POST['id_user']) != ""){
         $sqlQuery = 'INSERT INTO `relationships` (`user_1`, `user_2`, `active`) VALUES (:user_1, :user_2, :active)';
         $insertRelationship = $mysqlClient->prepare($sqlQuery);
         $insertRelationship->execute([
             'user_1' => $_SESSION['LOGGED_USER_id'],
-            'user_2' => $_POST['id_user'],
+            'user_2' => htmlspecialchars($_POST['id_user']),
             'active' => '0', // By default: 0 (not active). After, 1 when the user_2 accept
         ]);
 
@@ -114,10 +143,12 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
         $_SESSION["refresh_friend_array_TBC"] = 1;
         $_SESSION["refresh_friend_array_Hold"] = 1;
         
-        echo "The request was send to " . $_POST['id_user'];
+        echo "The request was send to " . htmlspecialchars($_POST['id_user']);
+        $_SESSION["return_page"] = "Profile";
     }
     else{
         $error = 'Please enter a correct number';
+        $_SESSION["return_page"] = "Profile";
     }
 }
 
@@ -202,8 +233,8 @@ if (!isset($_SESSION["relationShipsHold"]) && isset($_SESSION["LOGGED_USER_id"])
 // ##### Send message (public) ##### publicSend
 if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['publicSend'])){
     if (isset($_POST['object']) && isset($_POST['content'])){
-        if ($_POST['object'] != ""  && $_POST['content'] != ""){
-            if(strlen($_POST['content']) < 512 && strlen($_POST['object']) < 256){
+        if (htmlspecialchars($_POST['object']) != ""  && htmlspecialchars($_POST['content']) != ""){
+            if(strlen(htmlspecialchars($_POST['content'])) < 512 && strlen(htmlspecialchars($_POST['object'])) < 256){
                 $dateSend = date("YmdHis");
                 if($_FILES['screenshot']['error'] == 0){ // Let's test if the file has been sent and if there are no errors
                     // Let's test if the file is not too big
@@ -216,7 +247,7 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['publicSend'])){
                         if (in_array($extension, $allowedExtensions))
                         {
                             // The file can be validated and stored permanently
-                            $newName = $_SESSION['LOGGED_USER_id'] . '_' . $_SESSION['LOGGED_USER_fname'] . '_' . $dateSend . '.' . $fileInfo['extension'] /*. basename($_FILES['screenshot']['name'])*/;
+                            $newName = $_SESSION['LOGGED_USER_id'] . '_' . $dateSend . '.' . $fileInfo['extension'];
                             $path_in_holder = 'uploads/' . $newName;
                             move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
                             echo "<script language = javascript>alert('File uploaded successfully!');</script>";
@@ -226,17 +257,20 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['publicSend'])){
                             $insertRelationship->execute([
                                 'user_id' => $_SESSION['LOGGED_USER_id'],
                                 'date' => $dateSend,
-                                'title' => $_POST['object'],
-                                'content' => $_POST['content'],
+                                'title' => htmlspecialchars($_POST['object']),
+                                'content' => htmlspecialchars($_POST['content']),
                                 'file_name' => $newName,
                             ]);
+                            header("Refresh:0"); // Refresh the page to actualise
                         }
                         else{
                             $error = 'File not allowed. Please send jpg, jpeg, gif or png';
+                            $_SESSION["return_page"] = "Home";
                         }
                     }
                     else{
                         $error = 'File too big (Please send a file smaller than 10MB)';
+                        $_SESSION["return_page"] = "Home";
                     }
                 }
                 else{
@@ -245,21 +279,101 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['publicSend'])){
                     $insertRelationship->execute([
                         'user_id' => $_SESSION['LOGGED_USER_id'],
                         'date' => $dateSend,
-                        'title' => $_POST['object'],
-                        'content' => $_POST['content'],
+                        'title' => htmlspecialchars($_POST['object']),
+                        'content' => htmlspecialchars($_POST['content']),
                     ]);
+                    $_SESSION["return_page"] = "Home";
+                    header("Refresh:0"); // Refresh the page to actualise
                 }
             }
             else{
                 $error = 'Object or content too long (object<256 and content<512)';
+                $_SESSION["return_page"] = "Home";
             }
         }
         else{
             $error = 'You must send an object and a content';
+            $_SESSION["return_page"] = "Home";
         }
     }
     else{
         $error = 'You must send an object and a content';
+        $_SESSION["return_page"] = "Home";
+    }
+}
+
+
+// ##### Send message (private) ##### pprivateSend
+if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['private_message'])){
+    if (isset($_POST['object']) && isset($_POST['content'])){
+        if (htmlspecialchars($_POST['object']) != ""  && htmlspecialchars($_POST['content']) != ""){
+            if(strlen(htmlspecialchars($_POST['content'])) < 512 && strlen(htmlspecialchars($_POST['object'])) < 256){
+                $dateSend = date("YmdHis");
+                if($_FILES['screenshot']['error'] == 0){ // Let's test if the file has been sent and if there are no errors
+                    // Let's test if the file is not too big
+                    if ($_FILES['screenshot']['size'] <= 10000000)
+                    {
+                        // Let's test if the extension is allowed
+                        $fileInfo = pathinfo($_FILES['screenshot']['name']);
+                        $extension = $fileInfo['extension'];
+                        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+                        if (in_array($extension, $allowedExtensions))
+                        {
+                            // The file can be validated and stored permanently
+                            $newName = $_SESSION['LOGGED_USER_id'] . '_' . $_SESSION["private_to"][0] . '_' . $dateSend . '.' . $fileInfo['extension'];
+                            $path_in_holder = 'uploads/' . $newName;
+                            move_uploaded_file($_FILES['screenshot']['tmp_name'], $path_in_holder);
+                            echo "<script language = javascript>alert('File uploaded successfully!');</script>";
+                            
+                            $sqlQuery = 'INSERT INTO `private_post` (`userfrom_id`, `userto_id`, `date`, `title`, `content`, `file_name`) VALUES (:userfrom_id, :userto_id, :date, :title, :content, :file_name)';
+                            $insertRelationship = $mysqlClient->prepare($sqlQuery);
+                            $insertRelationship->execute([
+                                'userfrom_id' => $_SESSION['LOGGED_USER_id'],
+                                'userto_id' => $_SESSION["private_to"][0],
+                                'date' => $dateSend,
+                                'title' => htmlspecialchars($_POST['object']),
+                                'content' => htmlspecialchars($_POST['content']),
+                                'file_name' => $newName,
+                            ]);
+                            header("Refresh:0"); // Refresh the page to actualise
+                        }
+                        else{
+                            $error = 'File not allowed. Please send jpg, jpeg, gif or png';
+                            $_SESSION["return_page"] = "Messaging";
+                        }
+                    }
+                    else{
+                        $error = 'File too big (Please send a file smaller than 10MB)';
+                        $_SESSION["return_page"] = "Messaging";
+                    }
+                }
+                else{
+                    $sqlQuery = 'INSERT INTO `private_post` (`userfrom_id`, `userto_id`, `date`, `title`, `content`) VALUES (:userfrom_id, :userto_id, :date, :title, :content)';
+                    $insertRelationship = $mysqlClient->prepare($sqlQuery);
+                    $insertRelationship->execute([
+                        'userfrom_id' => $_SESSION['LOGGED_USER_id'],
+                        'userto_id' => $_SESSION["private_message_user"][0],
+                        'date' => $dateSend,
+                        'title' => htmlspecialchars($_POST['object']),
+                        'content' => htmlspecialchars($_POST['content']),
+                    ]);
+                    $_SESSION["return_page"] = "Messaging";
+                    header("Refresh:0"); // Refresh the page to actualise
+                }
+            }
+            else{
+                $error = 'Object or content too long (object<256 and content<512)';
+                $_SESSION["return_page"] = "Messaging";
+            }
+        }
+        else{
+            $error = 'You must send an object and a content';
+            $_SESSION["return_page"] = "Messaging";
+        }
+    }
+    else{
+        $error = 'You must send an object and a content';
+        $_SESSION["return_page"] = "Messaging";
     }
 }
 

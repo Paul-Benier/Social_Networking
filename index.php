@@ -34,6 +34,12 @@ $publicPostsStatement = $mysqlClient->prepare($sqlQuery);
 $publicPostsStatement->execute();
 $publicPosts = $publicPostsStatement->fetchAll();
 
+// ##### Get the whole public_post table #####
+$sqlQuery = 'SELECT * FROM private_post ORDER BY `date` DESC';
+$privatePostsStatement = $mysqlClient->prepare($sqlQuery);
+$privatePostsStatement->execute();
+$privatePosts = $privatePostsStatement->fetchAll();
+
 
 include('functions.php');
 
@@ -55,7 +61,7 @@ include('functions.php');
             <?php 
             include('header.php'); 
             if(isset($_SESSION['LOGGED_USER_fname'])){
-                echo $_SESSION['LOGGED_USER_fname'];
+                echo htmlspecialchars($_SESSION['LOGGED_USER_fname']);
             }
             ?>
         </header> <!-- ##### end - HEADER ##### -->
@@ -74,10 +80,18 @@ include('functions.php');
                     include('login.php');
                 }
             }
+            else if (isset($_SESSION["return_page"])){
+                if ($_SESSION["return_page"] == "Signup"){
+                    include('signup.php');
+                }
+                else if ($_SESSION["return_page"] == "Signin"){
+                    include('login.php');
+                }
+            }
             ?>     
 
             <form action="index.php" method="post">
-                <?php if(!isset($_SESSION['LOGGED_USER_fname'])) : ?>
+                <?php if (!isset($_SESSION['LOGGED_USER_fname'])) : ?>
                     <?php if (isset($_POST['login'])) : ?>
                         <?php if ($_POST['login'] != "Signup") : ?>
                             <button type="submit" name="login" value="Signup">Sign up</button> <!-- Create an account -->
@@ -94,44 +108,30 @@ include('functions.php');
             </form>
 
             <?php 
-            if(isset($_POST['menu'])){
-                if($_POST['menu'] == "Members"){
-                    if(isset($_SESSION['LOGGED_USER_fname'])){
-                        $_SESSION["refresh_friend_array"] = 1;
-                        $_SESSION["refresh_friend_array_TBC"] = 1;
-                        $_SESSION["refresh_friend_array_Hold"] = 1;
-                        include('members.php');
-                    }
-                    else{
-                        echo 'To access the site, you must log in';
-                    }
-                }
-                else if($_POST['menu'] == "Messaging"){
-                    if(isset($_SESSION['LOGGED_USER_fname'])){
-                        include('messaging.php');
-                    }
-                    else{
-                        echo 'To access the site, you must log in';
-                    }
-                }
-                else if($_POST['menu'] == "Myprofile"){
-                    if(isset($_SESSION['LOGGED_USER_fname'])){
+            
+            if (isset($_SESSION["return_page"])){
+                if (isset($_SESSION['LOGGED_USER_fname'])){
+                    if ($_SESSION["return_page"] == "Profile"){
                         $_SESSION["refresh_friend_array"] = 1;
                         $_SESSION["refresh_friend_array_TBC"] = 1;
                         $_SESSION["refresh_friend_array_Hold"] = 1;
                         include('profile.php');
                     }
-                    else{
-                        echo 'To access the site, you must log in';
+                    else if ($_SESSION["return_page"] == "Messaging"){
+                        include('messaging.php');
+                    }
+                    else if ($_SESSION["return_page"] == "Members"){
+                        $_SESSION["refresh_friend_array"] = 1;
+                        $_SESSION["refresh_friend_array_TBC"] = 1;
+                        $_SESSION["refresh_friend_array_Hold"] = 1;
+                        include('members.php');
+                    }
+                    else if ($_SESSION["return_page"] == "Home"){
+                        include('home.php');
                     }
                 }
                 else{
-                    if(isset($_SESSION['LOGGED_USER_fname'])){
-                        include('home.php');
-                    }
-                    else{
-                        echo 'To access the site, you must log in';
-                    }
+                    echo 'To access the site, you must log in';
                 }
             }
             ?>
