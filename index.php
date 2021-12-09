@@ -97,6 +97,9 @@ include('functions.php');
             if(isset($_POST['menu'])){
                 if($_POST['menu'] == "Members"){
                     if(isset($_SESSION['LOGGED_USER_fname'])){
+                        $_SESSION["refresh_friend_array"] = 1;
+                        $_SESSION["refresh_friend_array_TBC"] = 1;
+                        $_SESSION["refresh_friend_array_Hold"] = 1;
                         include('members.php');
                     }
                     else{
@@ -113,6 +116,9 @@ include('functions.php');
                 }
                 else if($_POST['menu'] == "Myprofile"){
                     if(isset($_SESSION['LOGGED_USER_fname'])){
+                        $_SESSION["refresh_friend_array"] = 1;
+                        $_SESSION["refresh_friend_array_TBC"] = 1;
+                        $_SESSION["refresh_friend_array_Hold"] = 1;
                         include('profile.php');
                     }
                     else{

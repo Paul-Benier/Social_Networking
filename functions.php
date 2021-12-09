@@ -1,5 +1,17 @@
 <?php
 
+if (!isset($_SESSION["refresh_friend_array"])){
+    $_SESSION["refresh_friend_array"] = 1;
+}
+
+if (!isset($_SESSION["refresh_friend_array_TBC"])){
+    $_SESSION["refresh_friend_array_TBC"] = 1;
+}
+
+if (!isset($_SESSION["refresh_friend_array_Hold"])){
+    $_SESSION["refresh_friend_array_Hold"] = 1;
+}
+
 // ##### Sign up validation #####
 if (isset($_POST['login_form'])){
     if ($_POST['login_form'] == "Signup"){
@@ -57,28 +69,33 @@ if (isset($_POST['login_form'])){
 }
 
 
-// ##### Put all relationships in the $_SESSION["relationShips"] array #####
-if (!isset($_SESSION["relationShips"]) && isset($_SESSION["LOGGED_USER_id"])){
-    $_SESSION["relationShips"] = array();
-    $counterRelationShips = 0;
-    $test = $_SESSION["LOGGED_USER_id"];
-    $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . $test . ' AND `active`= 1 OR `user_2` = ' . $test . ' AND `active`= 1';
-    $searchRelationship = $mysqlClient->prepare($sqlQuery);
-    $searchRelationship->execute();
-    $relationships = $searchRelationship->fetchAll();
+// ##### Validate request friend #####
+if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['validate_request'])){
+    if ($_POST['validate_request'] != ""){
+        $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . $_POST['validate_request'] . ' AND `user_2` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 0';
+        $searchRelationshipValidate = $mysqlClient->prepare($sqlQuery);
+        $searchRelationshipValidate->execute();
+        $relationshipsValidate = $searchRelationshipValidate->fetchAll();
 
-    foreach ($relationships as $relationship) {
-        if ($relationship['user_2'] == $test){
-            $_SESSION["relationShips"][$counterRelationShips] = $relationship['user_1'];
-            $counterRelationShips++;
+        foreach ($relationshipsValidate as $relationshipValidate){
+            $validate_friend_id = $relationshipValidate["relationship_id"];
         }
-        else if ($relationship['user_1'] == $test){
-            $_SESSION["relationShips"][$counterRelationShips] = $relationship['user_2'];
-            $counterRelationShips++;
-        }
+
+
+        $sqlQuery = 'UPDATE `relationships` SET user_1=:user_1, user_2=:user_2, active=:active WHERE relationship_id = ' . $validate_friend_id;
+        $validateRelationship = $mysqlClient->prepare($sqlQuery);
+        $validateRelationship->execute([
+            'user_1' => $_POST['validate_request'],
+            'user_2' => $_SESSION['LOGGED_USER_id'],
+            'active' => '1', // 1 when the user_2 accept
+        ]);
+        $_SESSION["refresh_friend_array"] = 1;
+        $_SESSION["refresh_friend_array_TBC"] = 1;
+        $_SESSION["refresh_friend_array_Hold"] = 1;
     }
-
-    sort($_SESSION["relationShips"]);
+    else{
+        $error = 'Please enter a correct number';
+    }
 }
 
 
@@ -90,16 +107,94 @@ if(isset($_SESSION['LOGGED_USER_id']) && isset($_POST['id_user'])){
         $insertRelationship->execute([
             'user_1' => $_SESSION['LOGGED_USER_id'],
             'user_2' => $_POST['id_user'],
-            'active' => '1', // for the moment, by default: 1 (active). After 0 by default and 1 when the user_2 accept
+            'active' => '0', // By default: 0 (not active). After, 1 when the user_2 accept
         ]);
 
-        $_SESSION["relationShips"][count($_SESSION["relationShips"])] = $_POST['id_user'];
-        sort($_SESSION["relationShips"]);
+        $_SESSION["refresh_friend_array"] = 1;
+        $_SESSION["refresh_friend_array_TBC"] = 1;
+        $_SESSION["refresh_friend_array_Hold"] = 1;
         
-        echo "You are now friend with " . $_POST['id_user'];
+        echo "The request was send to " . $_POST['id_user'];
     }
     else{
         $error = 'Please enter a correct number';
+    }
+}
+
+
+// ##### Put all relationships in the $_SESSION["relationShips"] array #####
+if (!isset($_SESSION["relationShips"]) && isset($_SESSION["LOGGED_USER_id"]) || isset($_SESSION["refresh_friend_array"])){
+    if ($_SESSION["refresh_friend_array"] == 1 && isset($_SESSION["LOGGED_USER_id"])){
+        $_SESSION["relationShips"] = array();
+        $counterRelationShips = 0;
+        $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 1 OR `user_2` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 1';
+        $searchRelationship = $mysqlClient->prepare($sqlQuery);
+        $searchRelationship->execute();
+        $relationships = $searchRelationship->fetchAll();
+
+        foreach ($relationships as $relationship) {
+            if ($relationship['user_2'] == $_SESSION["LOGGED_USER_id"]){
+                $_SESSION["relationShips"][$counterRelationShips] = $relationship['user_1'];
+                $counterRelationShips++;
+            }
+            else if ($relationship['user_1'] == $_SESSION["LOGGED_USER_id"]){
+                $_SESSION["relationShips"][$counterRelationShips] = $relationship['user_2'];
+                $counterRelationShips++;
+            }
+        }
+        sort($_SESSION["relationShips"]);
+        $_SESSION["refresh_friend_array"] = 0;
+    }
+    
+}
+
+// ##### Put all relationships to be confirmed by the LOGGED user in the $_SESSION["relationShipsTBC"] array ##### --> TBC : To Be Confirmed
+if (!isset($_SESSION["relationShipsTBC"]) && isset($_SESSION["LOGGED_USER_id"]) || isset($_SESSION["refresh_friend_array_TBC"])){
+    if ($_SESSION["refresh_friend_array_TBC"] == 1 && isset($_SESSION["LOGGED_USER_id"])){
+        $_SESSION["relationShipsTBC"] = array();
+        $counterRelationShipsTBC = 0;
+        $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_2` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 0';
+        $searchRelationshipTBC = $mysqlClient->prepare($sqlQuery);
+        $searchRelationshipTBC->execute();
+        $relationshipsTBC = $searchRelationshipTBC->fetchAll();
+
+        foreach ($relationshipsTBC as $relationshipTBC) {
+            if ($relationshipTBC['user_2'] == $_SESSION["LOGGED_USER_id"]){
+                $_SESSION["relationShipsTBC"][$counterRelationShipsTBC] = $relationshipTBC['user_1'];
+                $counterRelationShipsTBC++;
+            }
+            else if ($relationshipTBC['user_1'] == $_SESSION["LOGGED_USER_id"]){
+                $_SESSION["relationShipsTBC"][$counterRelationShipsTBC] = $relationshipTBC['user_2'];
+                $counterRelationShipsTBC++;
+            }
+        }
+        sort($_SESSION["relationShipsTBC"]);
+        $_SESSION["refresh_friend_array_TBC"] = 0;
+    }
+}
+
+// ##### Put all relationships to be confirmed by the OTHER user in the $_SESSION["relationShipsHold"] array ##### --> Hold : The other user must accept the relation.
+if (!isset($_SESSION["relationShipsHold"]) && isset($_SESSION["LOGGED_USER_id"]) || isset($_SESSION["refresh_friend_array_Hold"])){
+    if ($_SESSION["refresh_friend_array_Hold"] == 1 && isset($_SESSION["LOGGED_USER_id"])){
+        $_SESSION["relationShipsHold"] = array();
+        $counterRelationShipsHold = 0;
+        $sqlQuery = 'SELECT * FROM `relationships` WHERE `user_1` = ' . $_SESSION["LOGGED_USER_id"] . ' AND `active`= 0';
+        $searchRelationshipHold = $mysqlClient->prepare($sqlQuery);
+        $searchRelationshipHold->execute();
+        $relationshipsHold = $searchRelationshipHold->fetchAll();
+
+        foreach ($relationshipsHold as $relationshipHold) {
+            if ($relationshipHold['user_2'] == $_SESSION["LOGGED_USER_id"]){
+                $_SESSION["relationShipsHold"][$counterRelationShipsHold] = $relationshipHold['user_1'];
+                $counterRelationShipsHold++;
+            }
+            else if ($relationshipHold['user_1'] == $_SESSION["LOGGED_USER_id"]){
+                $_SESSION["relationShipsHold"][$counterRelationShipsHold] = $relationshipHold['user_2'];
+                $counterRelationShipsHold++;
+            }
+        }
+        sort($_SESSION["relationShipsHold"]);
+        $_SESSION["refresh_friend_array_Hold"] = 0;
     }
 }
 
