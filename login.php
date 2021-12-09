@@ -1,7 +1,7 @@
 <?php 
 
 // ##### Login form when the user is disconnect #####
-if(!isset($_SESSION['LOGGED_USER_fname'])): ?>
+if(!isset($_SESSION['LOGGED_USER'][0])): ?>
     <form action="index.php" method="post">
 
         <label for="email">Email</label>

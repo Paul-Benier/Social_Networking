@@ -1,12 +1,12 @@
 <?php 
 
-    if (isset($_SESSION["relationShips"]) && isset($_SESSION["LOGGED_USER_id"])){
+    if (isset($_SESSION["relationShips"]) && isset($_SESSION["LOGGED_USER"][0])){
         if (!empty($_SESSION["relationShips"])){
             echo '<h2>Private messaging:</h2>';
             echo '<form action="index.php" method="post">';
             foreach ($users as $user) {
-                if (in_array($user['user_id'], $_SESSION["relationShips"]) && $user['user_id'] != $_SESSION["LOGGED_USER_id"]){
-                    echo '<button type="submit" name="private_messaging_id" value=' . $user['user_id'] . '>' . $user['user_id'] . ' ' . htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']) . '</button>';
+                if (in_array($user['user_id'], $_SESSION["relationShips"]) && $user['user_id'] != $_SESSION["LOGGED_USER"][0]){
+                    echo '<button type="submit" name="private_messaging_id" value=' . $user['user_id'] . '>' . $user['user_id'] . ' ' . $user['first_name'] . ' ' . $user['last_name'] . '</button>';
                 }
             }
             echo '</form>';
@@ -16,7 +16,7 @@
     if (isset($_POST["private_messaging_id"])){
         foreach ($users as $user) {
             if ($user['user_id'] == $_POST["private_messaging_id"]){
-                $_SESSION["private_message_user"] = array($user['user_id'], htmlspecialchars($user['first_name']), htmlspecialchars($user['last_name']));
+                $_SESSION["private_message_user"] = array($user['user_id'], $user['first_name'], $user['last_name']);
             }
         }
     }
@@ -38,15 +38,15 @@
         <?php
         foreach ($users as $user) {
             if ($user['user_id'] == $_SESSION["private_message_user"][0]){
-                $fname = htmlspecialchars($user['first_name']);
-                $lname = htmlspecialchars($user['last_name']);
+                $fname = $user['first_name'];
+                $lname = $user['last_name'];
             }
         }
         foreach ($privatePosts as $privatePost) {
-            if ($privatePost['userfrom_id'] == $_SESSION["private_message_user"][0] && $privatePost['userto_id'] == $_SESSION['LOGGED_USER_id']){
+            if ($privatePost['userfrom_id'] == $_SESSION["private_message_user"][0] && $privatePost['userto_id'] == $_SESSION['LOGGED_USER'][0]){
                 if ($privatePost['file_name'] == NULL){
                     echo '<div>
-                            From ' . $privatePost['userfrom_id'] . ' ' . $fname . ' ' . $lname . ' to ' . $_SESSION['LOGGED_USER_id'] . ' ' . $_SESSION['LOGGED_USER_fname'] . ' send on ' . $privatePost['date'] . 
+                            From ' . $privatePost['userfrom_id'] . ' ' . $fname . ' ' . $lname . ' to ' . $_SESSION['LOGGED_USER'][1] . ' ' . $_SESSION['LOGGED_USER'][2] . ' send on ' . $privatePost['date'] . 
                             '<h3>' . htmlspecialchars($privatePost['title']) . '</h3>' . 
                             htmlspecialchars($privatePost['content']) . 
                         '</div>';
@@ -54,7 +54,7 @@
                 else {
                     echo 
                     '<div> 
-                        From ' . $privatePost['userfrom_id'] . ' ' . $fname . ' ' . $lname . ' to ' . $_SESSION['LOGGED_USER_id'] . ' ' . $_SESSION['LOGGED_USER_fname'] . ' send on ' . $privatePost['date'] .
+                        From ' . $privatePost['userfrom_id'] . ' ' . $fname . ' ' . $lname . ' to ' . $_SESSION['LOGGED_USER'][1] . ' ' . $_SESSION['LOGGED_USER'][2] . ' send on ' . $privatePost['date'] .
                         '<h3>' . htmlspecialchars($privatePost['title']) . '</h3>' .
                         htmlspecialchars($privatePost['content']) . '<br>' .
                         '<img src="uploads/' . $privatePost['file_name'] . '" alt="' . $privatePost['file_name'] . '">' .
@@ -62,10 +62,10 @@
                 }
                 echo '<hr>';
                 }
-            else if ($privatePost['userto_id'] == $_SESSION["private_message_user"][0] && $privatePost['userfrom_id'] == $_SESSION['LOGGED_USER_id']){
+            else if ($privatePost['userto_id'] == $_SESSION["private_message_user"][0] && $privatePost['userfrom_id'] == $_SESSION['LOGGED_USER'][0]){
                 if ($privatePost['file_name'] == NULL){
                     echo '<div style="background-color: navy;">
-                    From ' . $_SESSION['LOGGED_USER_id'] . ' ' . $_SESSION['LOGGED_USER_fname'] . ' to ' . $privatePost['userto_id'] . ' ' . $fname . ' ' . $lname . ' send on ' . $privatePost['date'] . 
+                    From ' . $_SESSION['LOGGED_USER'][1] . ' ' . $_SESSION['LOGGED_USER'][2] . ' to ' . $privatePost['userto_id'] . ' ' . $fname . ' ' . $lname . ' send on ' . $privatePost['date'] . 
                             '<h3>' . htmlspecialchars($privatePost['title']) . '</h3>' . 
                             htmlspecialchars($privatePost['content']) . 
                         '</div>';
@@ -73,7 +73,7 @@
                 else {
                     echo 
                     '<div style="background-color: navy;"> 
-                    From ' . $_SESSION['LOGGED_USER_id'] . ' ' . $_SESSION['LOGGED_USER_fname'] . ' to ' . $privatePost['userto_id'] . ' ' . $fname . ' ' . $lname . ' send on ' . $privatePost['date'] . 
+                    From ' . $_SESSION['LOGGED_USER'][1] . ' ' . $_SESSION['LOGGED_USER'][2] . ' to ' . $privatePost['userto_id'] . ' ' . $fname . ' ' . $lname . ' send on ' . $privatePost['date'] . 
                         '<h3>' . htmlspecialchars($privatePost['title']) . '</h3>' .
                         htmlspecialchars($privatePost['content']) . '<br>' .
                         '<img src="uploads/' . $privatePost['file_name'] . '" alt="' . $privatePost['file_name'] . '">' .

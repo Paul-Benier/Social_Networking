@@ -1,4 +1,4 @@
-<?php if (isset($_SESSION['LOGGED_USER_fname'])){?>
+<?php if (isset($_SESSION['LOGGED_USER'][0])){?>
     <form action="#" method="POST" enctype="multipart/form-data">
         <label for="object">Object:</label>
         <input type="text" id="object" name="object" placeholder="The subject of your message...">
@@ -17,8 +17,8 @@
     foreach ($publicPosts as $publicPost) {
         foreach ($users as $user) {
             if ($user['user_id'] == $publicPost['user_id']){
-                $fname = htmlspecialchars($user['first_name']);
-                $lname = htmlspecialchars($user['last_name']);
+                $fname = $user['first_name'];
+                $lname = $user['last_name'];
             }
         }
         if ($publicPost['file_name'] == NULL){
